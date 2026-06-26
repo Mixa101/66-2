@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>
+        <p>BLOG</p>
+        {{ post.title }}
+    </h1>
+    <h2>
+        {{ post.content }}
+    </h2>
+    {% if post.rate %}
+    <p>
+        {{ post.rate }}
+    </p>
+    {% else %}
+    <p>
+        Rate is nulls
+    </p>
+    {% endif %}
+    {% for comment in post.comments %}
+        <strong>{{ comment }}</strong>
+        <br>
+    {% endfor %}
+
+{% endblock %}
+
+
