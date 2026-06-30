@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+
+  <!-- Шапка: заголовок + поиск -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+    
+    <div>
+      <h2 class="fw-bold mb-1">Публикации</h2>
+      {% if request.GET.q %}
+        <p class="text-muted mb-0">
+          Найдено <strong>{{ count }}</strong> постов по запросу: 
+          <span class="text-dark">"{{ request.GET.q }}"</span>
+        </p>
+      {% else %}
+        <p class="text-muted mb-0">Всего <strong>{{ count }}</strong> постов</p>
+      {% endif %}
+    </div>
+
+    <!-- Форма поиска -->
+    <form method="get" class="w-100" style="max-width: 420px;">
+      <div class="input-group shadow-sm">
+        <input type="text" 
+               name="q" 
+               class="form-control form-control-lg" 
+               placeholder="Поиск по заголовку или тексту..." 
+               value="{{ request.GET.q|default:'' }}"
+               autocomplete="off">
+        
+        <button class="btn btn-primary px-4" type="submit">
+          <i class="bi bi-search me-1"></i> Найти
+        </button>
+        
+        {% if request.GET.q %}
+        <a href="?" class="btn btn-outline-secondary px-3" title="Сбросить поиск">
+          <i class="bi bi-x-lg"></i>
+        </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Карточки -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for post in posts %}
+    <div class="col">
+      <div class="card h-100 border-0 shadow-sm overflow-hidden">
+        
+        <!-- Изображение -->
+        {% if post.image %}
+        <img src="{{ post.image.url }}" 
+             class="card-img-top" 
+             alt="{{ post.title }}"
+             style="height: 190px; object-fit: cover;">
+        {% else %}
+        <div class="bg-light d-flex align-items-center justify-content-center" 
+             style="height: 190px;">
+          <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+        </div>
+        {% endif %}
+
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fw-semibold mb-3">{{ post.title }}</h5>
+          
+          <p class="card-text text-muted flex-grow-1">
+            {{ post.content|truncatewords:20 }}
+          </p>
+
+          <div class="mt-auto pt-3 border-top">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <small class="text-muted">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ post.created_at|date:"d.m.Y H:i" }}
+              </small>
+            </div>
+
+            <a href="#" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+              Читать
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-warning text-center py-4">
+          {% if request.GET.q %}
+            По запросу <strong>"{{ request.GET.q }}"</strong> ничего не найдено.
+          {% else %}
+            Постов пока нет.
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

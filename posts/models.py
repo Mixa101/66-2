@@ -17,3 +17,14 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     rate = models.IntegerField()
+    created_at = models.DateTimeField()
+    test = models.IntegerField(null=True)
+    image = models.ImageField(null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Пост"
+        verbose_name_plural = "Посты"
+
+    def __str__(self) -> str:
+        return f"{self.title}    {self.pk}"

@@ -1,5 +1,8 @@
+from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
+
+from posts.models import Post
 
 
 def home(request):
@@ -16,12 +19,16 @@ def about(request):
     return HttpResponseBadRequest(response)
 
 
-def test(request):
-    post = {
-        "title": "POST #1",
-        "content": "Lorem ipsum dolor dasdas",
-        "rate": 5,
-        "comments": ["Good post", "отстойный пост", "dasdasda"],
-    }
+def post_list(request: HttpRequest):
+    q = request.GET.get("q", None)
 
-    return render(request, "index.html", context={"post": post})
+    posts = Post.objects.filter()
+
+    if q:
+        posts = posts.filter(title__icontains=q)
+
+    post_count = posts.count()
+
+    context_obj = {"posts": posts, "count": post_count}
+
+    return render(request, "posts/post_list.html", context_obj)
