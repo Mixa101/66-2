@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Создать новый пост</h4>
+                </div>
+                <div class="card-body">
+
+                    <!-- Простой вывод всех ошибок -->
+                    {% if errors %}
+                        <div class="alert alert-danger">
+                            <strong>Ошибки формы:</strong>
+                            <ul class="mb-0">
+                                {% for error in errors %}
+                                        <li> {{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Заголовок</label>
+                            <input type="text" 
+                                   name="title" 
+                                   class="form-control" 
+                                   placeholder="Введите заголовок поста"
+                                   value="{{ request.POST.title|default:'' }}"
+                                   required>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Содержание</label>
+                            <textarea name="content" 
+                                      class="form-control" 
+                                      rows="10"
+                                      placeholder="Напишите текст поста..."
+                                      required>{{ request.POST.content|default:'' }}</textarea>
+                        </div>
+
+                        <!-- Rate -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Оценка (rate)</label>
+                            <input type="number" 
+                                   name="rate" 
+                                   class="form-control" 
+                                   min="1" 
+                                   max="10" 
+                                   placeholder="От 1 до 10"
+                                   value="{{ request.POST.rate|default:'' }}"
+                                   required>
+                        </div>
+
+                        <!-- Image -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Изображение</label>
+                            <input type="file" 
+                                   name="image" 
+                                   class="form-control"
+                                   accept="image/*">
+                            <small class="text-muted">Поддерживаются: JPG, PNG, GIF и т.д.</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-upload me-2"></i>Опубликовать пост
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

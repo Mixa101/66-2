@@ -8,10 +8,10 @@
     
     <div>
       <h2 class="fw-bold mb-1">Публикации</h2>
-      {% if request.GET.q %}
+      {% if request.GET.search %}
         <p class="text-muted mb-0">
           Найдено <strong>{{ count }}</strong> постов по запросу: 
-          <span class="text-dark">"{{ request.GET.q }}"</span>
+          <span class="text-dark">"{{ request.GET.search }}"</span>
         </p>
       {% else %}
         <p class="text-muted mb-0">Всего <strong>{{ count }}</strong> постов</p>
@@ -22,7 +22,7 @@
     <form method="get" class="w-100" style="max-width: 420px;">
       <div class="input-group shadow-sm">
         <input type="text" 
-               name="q" 
+               name="search" 
                class="form-control form-control-lg" 
                placeholder="Поиск по заголовку или тексту..." 
                value="{{ request.GET.q|default:'' }}"

@@ -20,13 +20,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from posts.views import about, home, post_list
+from posts.views import about, home, post_create, post_list
 
 urlpatterns = [
     path("admin", admin.site.urls),
     path("", home),
-    path("about/", about),
-    path("posts/", post_list),
+    path("about/", about, name="about"),
+    path("posts/", post_list, name="post_list"),
+    path("posts/create", post_create, name="post_create"),
 ]
 
 if settings.DEBUG:

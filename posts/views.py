@@ -1,7 +1,8 @@
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
+from posts.form import PostForm
 from posts.models import Post
 
 
@@ -20,15 +21,33 @@ def about(request):
 
 
 def post_list(request: HttpRequest):
-    q = request.GET.get("q", None)
 
     posts = Post.objects.filter()
 
-    if q:
-        posts = posts.filter(title__icontains=q)
+    if search := request.GET.get("search", None):
+        posts = posts.filter(title__icontains=search)
 
     post_count = posts.count()
 
     context_obj = {"posts": posts, "count": post_count}
 
     return render(request, "posts/post_list.html", context_obj)
+
+
+def post_create(request: HttpRequest):
+    post_form = PostForm()
+    if request.method.lower() == "post":
+        post = PostForm(request.POST, request.FILES)
+        if post.is_valid():
+            post_object = Post(**post.cleaned_data)
+            post_object.save()
+            return redirect("post_list")
+        for error in post.errors:
+            print(error)
+            print("*" * 5)
+            print(type(error))
+        return render(
+            request, "posts/post_create.html", context={"errors": post.errors}
+        )
+
+    return render(request, "posts/post_create.html", context={"form": post_form})

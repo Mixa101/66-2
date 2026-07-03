@@ -17,8 +17,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     rate = models.IntegerField()
-    created_at = models.DateTimeField()
-    test = models.IntegerField(null=True)
+    created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(null=True)
 
     class Meta:
