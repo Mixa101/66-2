@@ -65,6 +65,9 @@
           
           <p class="card-text text-muted flex-grow-1">
             {{ post.content|truncatewords:20 }}
+          </p>          
+          <p class="card-text text-muted flex-grow-1">
+            User: {{ post.user.username }}
           </p>
 
           <div class="mt-auto pt-3 border-top">

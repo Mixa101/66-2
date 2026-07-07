@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
@@ -18,7 +19,10 @@ class Post(models.Model):
     content = models.TextField()
     rate = models.IntegerField()
     created_at = models.DateTimeField(auto_now=True)
-    image = models.ImageField(null=True)
+    image = models.ImageField(null=True, blank=True)
+    user = models.ForeignKey(
+        User, models.CASCADE, null=True, blank=True, related_name="posts"
+    )
 
     class Meta:
         ordering = ["-created_at"]

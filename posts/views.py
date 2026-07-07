@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
@@ -22,30 +23,27 @@ def about(request):
 
 def post_list(request: HttpRequest):
 
-    posts = Post.objects.filter()
+    posts = Post.objects.filter().select_related("user")
 
     if search := request.GET.get("search", None):
         posts = posts.filter(title__icontains=search)
 
-    post_count = posts.count()
-
+    post_count = posts.count
     context_obj = {"posts": posts, "count": post_count}
 
     return render(request, "posts/post_list.html", context_obj)
 
 
+@login_required
 def post_create(request: HttpRequest):
     post_form = PostForm()
     if request.method.lower() == "post":
         post = PostForm(request.POST, request.FILES)
         if post.is_valid():
             post_object = Post(**post.cleaned_data)
+            post_object.user = request.user
             post_object.save()
             return redirect("post_list")
-        for error in post.errors:
-            print(error)
-            print("*" * 5)
-            print(type(error))
         return render(
             request, "posts/post_create.html", context={"errors": post.errors}
         )

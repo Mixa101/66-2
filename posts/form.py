@@ -18,7 +18,7 @@ class PostForm(forms.Form):
         if "war" in data:
             raise forms.ValidationError("this is banned word!")
 
-        return self.cleaned_data
+        return data
 
     # def clean(self) -> dict[str, Any]:
     #     cleaned_data = super().clean()
