@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | Детали поста{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Кнопка назад -->
+      <div class="mb-4">
+        <a href="{% url 'post_list' %}" class="btn btn-outline-secondary">
+          ← Назад к списку постов
+        </a>      
+        {% if post.user == user %}
+        <div class="mb-4">
+        <a href="{% url 'post_edit' post.id %}" class="btn btn-outline-secondary">
+          Редактировать
+        </a>
+        {% endif %}
+        <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2 d-none d-md-inline">
+          Назад
+        </a>        
+        <a href="{% url 'delete_post' post.id %}" class="btn btn-outline-secondary ms-2 d-none d-md-inline">
+          Удалить
+        </a>
+      </div>
+
+      <!-- Карточка поста -->
+      <div class="card shadow-sm border-0 overflow-hidden">
+        
+        <!-- Изображение -->
+        {% if post.image %}
+          <img src="{{ post.image.url }}" 
+               class="card-img-top img-fluid w-100" 
+               alt="{{ post.title }}"
+               style="max-height: 420px; object-fit: cover;">
+        {% else %}
+          <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+               style="height: 220px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+            <div class="text-center text-muted">
+              <div style="font-size: 3rem; opacity: 0.6;">🖼️</div>
+              <p class="mb-0 mt-2">Изображение отсутствует</p>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="card-body p-4 p-md-5">
+          
+          <!-- Заголовок -->
+          <h1 class="card-title display-6 fw-bold mb-4 text-dark">{{ post.title }}</h1>
+
+          <!-- Мета-информация -->
+          <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4 mb-4 pb-3 border-bottom">
+            
+            <!-- Автор -->
+            <div class="d-flex align-items-center">
+              <span class="fs-4 me-2">👤</span>
+              <div>
+                <span class="text-muted small">Автор</span><br>
+                <span class="fw-semibold">{{ post.user.username }}</span>
+              </div>
+            </div>
+
+            <!-- Дата -->
+            <div class="d-flex align-items-center">
+              <span class="fs-4 me-2">📅</span>
+              <div>
+                <span class="text-muted small">Опубликовано</span><br>
+                <span class="fw-semibold">{{ post.created_at|date:"d.m.Y в H:i" }}</span>
+              </div>
+            </div>
+
+            <!-- Рейтинг -->
+            <div class="d-flex align-items-center ms-md-auto">
+              <div class="text-end me-3">
+                <span class="text-muted small d-block">Рейтинг</span>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-1">{{ post.rate|floatformat:"1" }}</span>
+              </div>
+              <div>
+                <span class="fs-2 text-warning" style="letter-spacing: 2px;">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= post.rate|floatformat:0 %}
+                      ⭐
+                    {% else %}
+                      ☆
+                    {% endif %}
+                  {% endfor %}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Контент поста -->
+          <div class="post-content">
+            <div class="fs-5 lh-lg text-dark" style="white-space: pre-line;">
+              {{ post.content|linebreaksbr }}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Футер карточки -->
+        <div class="card-footer bg-light border-0 p-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            
+            <div class="text-muted small">
+              Просмотры и реакции будут здесь (в будущем)
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-outline-primary" onclick="window.location.reload()">
+                🔄 Обновить
+              </button>
+              <a href="#" class="btn btn-outline-secondary">
+                🔗 Поделиться
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+<!-- ==================== БЛОК КОММЕНТАРИЕВ ==================== -->
+<div class="mt-5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0">
+      💬 Комментарии 
+      <span class="badge bg-secondary ms-2">{{ comments.count|default:0 }}</span>
+    </h4>
+  </div>
+
+  <!-- Список комментариев -->
+    <div class="mb-4">
+      {% for comment in post.comments.all %}
+        <div class="card mb-3 border-0 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="d-flex align-items-center">
+                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                     style="width: 36px; height: 36px; font-size: 14px;">
+                  {% if comment.user %}
+                  {{ comment.user.username|slice:":1"|upper }}
+                  {% else %}
+                  Анонимный пользователь
+                  {% endif %}
+                </div>
+                <div>
+                  <strong>{{ comment.user.username }}</strong>
+                  <small class="text-muted ms-2">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="ps-5">
+              <p class="mb-0 text-dark" style="white-space: pre-line;">{{ comment.content }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <!-- <div class="alert alert-light border text-center py-4 mb-4">
+      <p class="text-muted mb-0">Пока нет комментариев. Будьте первым!</p>
+    </div> -->
+
+  <!-- Форма добавления комментария -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h6 class="mb-3 fw-semibold">Оставить комментарий</h6>
+      
+      <form method="post" action="{% url 'add_comment' post.pk %}">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <textarea 
+            name="content" 
+            class="form-control" 
+            rows="3" 
+            placeholder="Напишите ваш комментарий..." 
+            required></textarea>
+        </div>
+        
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary">
+            Отправить комментарий
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .post-content p {
+    margin-bottom: 1.25rem;
+  }
+  .card {
+    border-radius: 16px;
+  }
+  .card-img-top {
+    border-radius: 16px 16px 0 0;
+  }
+</style>
+{% endblock %}

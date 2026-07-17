@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать пост — {{ post.title|default:"Новый пост" }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Заголовок страницы -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h2 class="mb-1">✏️ Редактировать пост</h2>
+          <p class="text-muted mb-0">Внесите изменения и сохраните</p>
+        </div>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+          ← Отмена
+        </a>
+      </div>
+
+      <!-- Форма редактирования (классический POST) -->
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+
+          <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            <!-- Заголовок -->
+            <div class="mb-4">
+              <label for="title" class="form-label fw-semibold">Заголовок поста</label>
+              <input type="text" 
+                     class="form-control form-control-lg" 
+                     id="title"
+                     name="title"
+                     value="{{ post.title|default:'' }}"
+                     placeholder="Введите заголовок поста"
+                     required>
+              <div class="invalid-feedback">Заголовок обязателен</div>
+            </div>
+
+            <!-- Содержание -->
+            <div class="mb-4">
+              <label for="content" class="form-label fw-semibold">Содержание</label>
+              <textarea class="form-control" 
+                        id="content" 
+                        name="content"
+                        rows="14"
+                        placeholder="Напишите подробное содержание поста..."
+                        required>{{ post.content|default:'' }}</textarea>
+              <div class="form-text">Поддерживаются переносы строк</div>
+              <div class="invalid-feedback">Содержание не может быть пустым</div>
+            </div>
+
+            <!-- Рейтинг -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Рейтинг</label>
+              <div class="d-flex align-items-center gap-3">
+                <div style="width: 140px;">
+                  <input type="number" 
+                         class="form-control form-control-lg text-center" 
+                         id="rate"
+                         name="rate"
+                         value="{{ post.rate|default:5 }}"
+                         min="1" 
+                         max="5" 
+                         step="0.1"
+                         style="font-size: 1.5rem; font-weight: 600;">
+                </div>
+                <div>
+                  <div id="rateStars" class="fs-1 text-warning" style="letter-spacing: 4px; cursor: pointer;"></div>
+                  <div class="form-text mt-1">Кликни на звёзды, чтобы изменить</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Изображение -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Изображение</label>
+              
+              {% if post.image %}
+              <div class="mb-3 p-3 bg-light rounded border">
+                <div class="d-flex align-items-start gap-3">
+                  <img src="{{ post.image.url }}" 
+                       alt="Текущее изображение" 
+                       class="img-thumbnail" 
+                       style="max-width: 160px; max-height: 120px; object-fit: cover;">
+                  <div>
+                    <div class="fw-medium">Текущее изображение</div>
+                    <div class="text-muted small">Оставьте поле ниже пустым, чтобы сохранить текущее изображение</div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              <input type="file" 
+                     class="form-control" 
+                     id="image"
+                     name="image"
+                     accept="image/jpeg,image/png,image/webp,image/gif">
+              <div class="form-text">Загрузите новое изображение (опционально)</div>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="d-flex flex-column flex-md-row gap-2 pt-3 border-top">
+              <button type="submit" class="btn btn-primary btn-lg flex-fill">
+                💾 Сохранить изменения
+              </button>
+              <a href="{% url 'post_list' %}" class="btn btn-outline-secondary btn-lg">
+                К списку постов
+              </a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== ЗВЁЗДЫ РЕЙТИНГА (оставил для удобства) ====================
+function updateStars(rating) {
+  const container = document.getElementById('rateStars');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  const rounded = Math.round(parseFloat(rating) || 0);
+  
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('span');
+    star.textContent = i <= rounded ? '⭐' : '☆';
+    star.style.cursor = 'pointer';
+    star.style.userSelect = 'none';
+    
+    star.addEventListener('click', () => {
+      const rateInput = document.getElementById('rate');
+      if (rateInput) {
+        rateInput.value = i;
+        updateStars(i);
+      }
+    });
+    
+    container.appendChild(star);
+  }
+}
+
+// Инициализация
+const rateInput = document.getElementById('rate');
+if (rateInput) {
+  updateStars(rateInput.value);
+  
+  rateInput.addEventListener('input', () => {
+    let val = parseFloat(rateInput.value);
+    if (val < 1) val = 1;
+    if (val > 5) val = 5;
+    rateInput.value = val;
+    updateStars(val);
+  });
+}
+</script>
+{% endblock %}
